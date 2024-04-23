@@ -60,13 +60,13 @@ ExternalProject_add(tango_idl_external
     GIT_REPOSITORY "https://gitlab.com/tango-controls/tango-idl.git"
     GIT_TAG "${IDL_VERSION}"
     CMAKE_GENERATOR Ninja
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX} -DCMAKE_INSTALL_LIBDIR=lib
 )
 
 ExternalProject_add(omniORB_external
     URL "https://sourceforge.net/projects/omniorb/files/omniORB/omniORB-${ORB_VERSION}/omniORB-${ORB_VERSION}.tar.bz2"
     URL_HASH SHA256=${ORB_HASH}
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=${CMAKE_INSTALL_PREFIX}
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=${CMAKE_INSTALL_PREFIX} --libdir=${CMAKE_INSTALL_PREFIX}/lib
 )
 
 set(ENV{PYTHONPATH} "${INTERMEDIATE_INSTALL_FOLDER}${CMAKE_INSTALL_PREFIX}/python2.7/dist-packages:$ENV{PYTHONPOATH}:${tango_idl_path}/lib/pkgconfig")
@@ -77,10 +77,10 @@ ExternalProject_add(cpptango_external
     GIT_TAG "${TANGO_VERSION}"
     DEPENDS tango_idl_external omniORB_external
     PATCH_COMMAND "sed" "--in-place" "-e" "/add_subdirectory(\"cpp_test_suite\")'/d" <SOURCE_DIR>/CMakeLists.txt
-    CMAKE_COMMAND PYTHONPATH=${INTERMEDIATE_INSTALL_FOLDER}${CMAKE_INSTALL_PREFIX}/lib/python2.7/dist-packages ${CMAKE_COMMAND}
     CMAKE_GENERATOR ${TANGO_GENERATOR}
     CMAKE_ARGS
         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+        -DCMAKE_INSTALL_LIBDIR=lib
         -DBUILD_TESTING=Off
 )
 
